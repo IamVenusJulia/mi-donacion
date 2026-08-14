@@ -12,8 +12,16 @@ export default function AuthPage(){
     if(!supabase){setMsg("No se pudo conectar con Supabase.");setBusy(false);return;}
     const email=String(f.get("email")||""); const password=String(f.get("password")||"");
     if(mode==="register"){
-      const {error}=await supabase.auth.signUp({email,password,options:{data:{full_name:String(f.get("full_name")||""),phone:String(f.get("phone")||"")}}});
-      if(error) setMsg(error.message); else setMsg("Cuenta creada. Si se solicita confirmación, revisa tu correo y luego inicia sesión.");
+      const emailRedirectTo=`${window.location.origin}/dashboard`;
+      const {error}=await supabase.auth.signUp({
+        email,
+        password,
+        options:{
+          emailRedirectTo,
+          data:{full_name:String(f.get("full_name")||""),phone:String(f.get("phone")||"")}
+        }
+      });
+      if(error) setMsg(error.message); else setMsg("Cuenta creada. Revisa tu correo para confirmar la cuenta y continuar al panel.");
     } else {
       const {error}=await supabase.auth.signInWithPassword({email,password});
       if(error) setMsg(error.message); else router.push("/dashboard");
